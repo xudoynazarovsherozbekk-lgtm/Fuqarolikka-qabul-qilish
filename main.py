@@ -1,89 +1,65 @@
-"""
-Oʻzbekiston Respublikasining Fuqaroligi Toʻgʻrisidagi Qonuniga asoslangan
-fuqarolikka qabul qilish tartibini aniqlovchi interaktiv dastur.
-"""
+import streamlit as st
 
+st.set_page_config(page_title="Oʻzbekiston Fuqaroligiga Qabul Qilish", page_icon="🇺🇿", layout="centered")
 
-class CitizenshipChecker:
-    def __init__(self):
-        self.user_data = {}
+st.title("🇺🇿 Oʻzbekiston Respublikasi Fuqaroligiga Qabul Qilish Tizimi")
+st.caption("Oʻzbekiston Respublikasining 'Fuqarolik toʻgʻrisida'gi Qonunining 18-22 moddalari asosida")
 
-    def get_yes_no(self, question: str) -> bool:
-        """Foydalanuvchidan 'ha' yoki 'yo'q' javobini olish uchun yordamchi funksiya."""
-        while True:
-            response = input(f"{question} (ha/yo'q): ").strip().lower()
-            if response in ['ha', 'h', 'yes', 'y']:
-                return True
-            elif response in ['yo\'q', 'yoq', 'n', 'no']:
-                return False
-            print("Iltimos, faqat 'ha' yoki 'yo\'q' deb javob bering.")
+st.markdown("---")
 
-    def run(self):
-        print("=" * 60)
-        print("  OʻZBEKISTON RESPUBLIKASI FUQAROLIGIGA QABUL QILISH")
-        print("           TIZIMIGA HUSH KELIBSIZ (18-22 MODDALAR)")
-        print("=" * 60)
-        print("\nSizga beriladigan savollarga javob berib, fuqarolikka qabul")
-        print("qilishning qaysi tartibiga mos kelishingizni aniqlang.\n")
+tab1, tab2, tab3 = st.tabs(["Alohida tartib (21-modda)", "Soddalashtirilgan tartib (20-modda)", "Umumiy tartib (19-modda)"])
 
-        # Alohida tartib (21-modda)
-        print("--- [1] ALOHIDA TARTIB (21-modda) ---")
-        if self.get_yes_no("Oʻzbekiston Respublikasi Prezidenti tomonidan milliy manfaatlardan kelib chiqib fuqarolik berilishi ko'zda tutilgan shaxslar toifasiga kirasizmi?"):
-            print("\nNatija: Siz 21-modda boʻyicha ALOHIDA TARTIBDA fuqarolikka qabul qilinishingiz mumkin.")
-            print("Eshtama: Sizga 19 va 20-moddalarning umumiy va soddalashtirilgan talablari qoʻllanilmaydi.")
-            return
+with tab1:
+    st.header("Alohida tartib (21-modda)")
+    p21 = st.checkbox("Oʻzbekiston Respublikasi Prezidenti tomonidan milliy manfaatlardan kelib chiqib fuqarolik berilishi ko'zda tutilgan shaxslar toifasiga kirasizmi?")
+    
+    if p21:
+        st.success("Siz 21-modda boʻyicha ALOHIDA TARTIBDA fuqarolikka qabul qilinishingiz mumkin.")
+        st.info("Eslatma: Sizga 19 va 20-moddalarning umumiy va soddalashtirilgan talablari qoʻllanilmaydi.")
 
-        # Soddalashtirilgan tartib (20-modda)
-        print("\n--- [2] SODDALASHTIRILGAN TARTIB (20-modda) ---")
-        is_vatandosh = self.get_yes_no("Siz Oʻzbekiston vatandoshi (chet elda yashaydigan vatandosh) hisoblanasizmi?")
+with tab2:
+    st.header("Soddalashtirilgan tartib (20-modda)")
+    is_vatandosh = st.radio("Siz Oʻzbekiston vatandoshi (chet elda yashaydigan vatandosh) hisoblanasizmi?", ["Tanlang...", "Ha", "Yo'q"])
+    
+    if is_vatandosh == "Ha":
+        has_relative = st.radio("Oʻzbekistonda yashaydigan va OʻzR fuqarosi boʻlgan toʻgʻri tutashgan qarindoshingiz bormi?", ["Tanlang...", "Ha", "Yo'q"])
+        has_achievements = "Yo'q"
         
-        if is_vatandosh:
-            has_relative = self.get_yes_no("Oʻzbekistonda yashaydigan va OʻzR fuqarosi boʻlgan toʻgʻri tutashgan qarindoshingiz (ota-ona, bobo-buvi va h.k.) bormi?")
-            has_achievements = False
+        if has_relative == "Yo'q":
+            has_achievements = st.radio("Ilm-fan, texnika, madaniyat, sport sohasida katta yutuqlarga yoki OʻzR uchun manfaatli kasbga egamisiz?", ["Tanlang...", "Ha", "Yo'q"])
+        
+        if has_relative == "Ha" or has_achievements == "Ha":
+            c1 = st.checkbox("Tirikchilikning qonuniy manbaiga egaman")
+            c2 = st.checkbox("OʻzR Konstitutsiyasiga rioya etish majburiyatini olaman")
+            c3 = st.checkbox("Davlat tilini muloqot qilish uchun zarur darajada bilaman")
             
-            if not has_relative:
-                has_achievements = self.get_yes_no("Ilm-fan, texnika, madaniyat, sport sohasida katta yutuqlarga yoki OʻzR uchun manfaatli kasb/malakaga egamisiz?")
+            if c1 and c2 and c3:
+                st.success("Siz 20-modda boʻyicha SODDALASHTIRILGAN TARTIBDA fuqarolikka murojaat qilishingiz mumkin.")
+                st.info("Eslatma: Qaror asosida sizga 1 yil muddatga amal qiluvchi 'Kafolat xati' beriladi.")
+            else:
+                st.warning("Soddalashtirilgan tartib uchun barcha shartlar bajarilishi kerak.")
 
-            if has_relative or has_achievements:
-                has_income = self.get_yes_no("Tirikchilikning qonuniy manbaiga egamisiz?")
-                accept_const = self.get_yes_no("OʻzR Konstitutsiyasiga rioya etish majburiyatini oʻz zimmangizga olasizmi?")
-                knows_lang = self.get_yes_no("Davlat tilini muloqot qilish uchun zarur darajada bilasizmi?")
-
-                if has_income and accept_const and knows_lang:
-                    print("\nNatija: Siz 20-modda boʻyicha SODDALASHTIRILGAN TARTIBDA fuqarolikka murojaat qilishingiz mumkin.")
-                    print("Eslatma: Qabul qilingan qaror asosida sizga 1 yil muddatga amal qiluvchi 'Kafolat xati' beriladi.")
-                    return
-                else:
-                    print("\nSoddalashtirilgan tartib uchun barcha shartlar (daromad, Konstitutsiya, til bilish) bajarilmadi.")
-
-        # Umumiy tartib (19-modda)
-        print("\n--- [3] UMUMIY TARTIB (19-modda) ---")
-        left_other_citizenship = self.get_yes_no("Chet davlat fuqaroligidan chiqishni rasmiylashtirganmisiz (yoki fuqaroligi bo'lmagan shaxs bo'lsangiz)?")
+with tab3:
+    st.header("Umumiy tartib (19-modda)")
+    left_cit = st.radio("Chet davlat fuqaroligidan chiqishni rasmiylashtirganmisiz (yoki fuqaroligi bo'lmagan shaxsmisiz)?", ["Tanlang...", "Ha", "Yo'q"])
+    
+    if left_cit == "Ha":
+        is_born = st.radio("Oʻzbekistonda tugʻilgan va yashab kelayotgan shaxsmisiz yoki OʻzR fuqarosi bilan nikohda uzluksiz 3 yil yashaganmisiz?", ["Tanlang...", "Ha", "Yo'q"])
         
-        if not left_other_citizenship:
-            print("\nNatija: Umumiy tartibda fuqarolikka kirish uchun chet davlat fuqaroligidan chiqish rasmiylashtirilgan boʻlishi kerak.")
-            return
-
-        is_born_here = self.get_yes_no("Oʻzbekiston Respublikasida tugʻilgan va yashab kelayotgan shaxs boʻlsangiz yoki OʻzR fuqarosi bilan nikohdan o'tib uzluksiz 3 yil birga yashaganmisiz?")
+        resided_5 = "Ha"
+        if is_born == "Yo'q":
+            resided_5 = st.radio("Yashash guvohnomasi olingan kundan e'tiboran uzluksiz 5 yil doimiy yashab kelayotganmisiz?", ["Tanlang...", "Ha", "Yo'q"])
         
-        if not is_born_here:
-            resided_5_years = self.get_yes_no("Yashash guvohnomasi olingan kundan e'tiboran Oʻzbekistonda uzluksiz 5 yil doimiy yashab kelayotganmisiz?")
-            if not resided_5_years:
-                print("\nNatija: Siz Oʻzbekiston hududida uzluksiz doimiy yashash muddatiga oid talabga javob bermaysiz.")
-                return
-        else:
-            print("-> Siz uchun 5 yillik uzluksiz yashash talabi tatbiq etilmaydi (yengillik berilgan).")
-
-        has_income_gen = self.get_yes_no("Tirikchilikning qonuniy manbaiga egamisiz?")
-        accept_const_gen = self.get_yes_no("OʻzR Konstitutsiyasiga rioya etish majburiyatini oʻz zimmangizga olasizmi?")
-        knows_lang_gen = self.get_yes_no("Davlat tilini muloqot qilish uchun zarur darajada bilasizmi?")
-
-        if has_income_gen and accept_const_gen and knows_lang_gen:
-            print("\nNatija: Siz 19-modda boʻyicha UMUMIY TARTIBDA fuqarolikka qabul qilinish huquqiga egasiz.")
-        else:
-            print("\nNatija: Siz umumiy tartibdagi fuqarolikka qabul qilish shartlariga toʻliq mos kelmadingiz.")
-
-
-if __name__ == "__main__":
-    app = CitizenshipChecker()
-    app.run()
+        if is_born == "Ha" or resided_5 == "Ha":
+            gc1 = st.checkbox("Tirikchilikning qonuniy manbaiga egaman ", key="gc1")
+            gc2 = st.checkbox("OʻzR Konstitutsiyasiga rioya etish majburiyatini olaman ", key="gc2")
+            gc3 = st.checkbox("Davlat tilini muloqot qilish uchun zarur darajada bilaman ", key="gc3")
+            
+            if gc1 and gc2 and gc3:
+                st.success("Siz 19-modda boʻyicha UMUMIY TARTIBDA fuqarolikka qabul qilinish huquqiga egasiz.")
+            else:
+                st.warning("Umumiy tartib shartlarini to'liq belgilang.")
+        elif resided_5 == "Yo'q":
+            st.error("Uzluksiz 5 yil yashash talabi bajarilmadi.")
+    elif left_cit == "Yo'q":
+        st.error("Umumiy tartibda fuqarolikka kirish uchun chet davlat fuqaroligidan chiqish talab etiladi.")
